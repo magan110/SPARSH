@@ -46,6 +46,19 @@ class SparshTheme {
   static const Color borderMedium = Color(0xFFBDBDBD);
   static const Color borderDark = Color(0xFF757575);
   
+  // Glassmorphic Colors
+  static const Color glassWhite = Color(0x26FFFFFF);
+  static const Color glassBorder = Color(0x4DFFFFFF);
+  static const Color glassBackground = Color(0x0DFFFFFF);
+  
+  // Brutalist Colors
+  static const Color brutalistBlack = Color(0xFF000000);
+  static const Color brutalistWhite = Color(0xFFFFFFFF);
+  static const Color brutalistYellow = Color(0xFFFFFF00);
+  static const Color brutalistRed = Color(0xFFFF0000);
+  static const Color brutalistBlue = Color(0xFF0000FF);
+  static const Color brutalistGreen = Color(0xFF00FF00);
+
   // Status Colors - Material Design 3 Semantic Colors
   static const Color successGreen = Color(0xFF4CAF50);
   static const Color successLight = Color(0xFFE8F5E8);
@@ -804,4 +817,4 @@ class SparshCurves {
   static const Curve easeIn = Curves.easeIn;
   static const Curve fastOutSlowIn = Curves.fastOutSlowIn;
   static const Curve bounceOut = Curves.bounceOut;
-}  
+}    

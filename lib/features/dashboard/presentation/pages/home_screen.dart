@@ -23,8 +23,9 @@ import 'universal_outlet_registration_page.dart';
 import 'mail_screen.dart';
 import 'package:learning2/core/constants/fonts.dart';
 import 'package:learning2/core/theme/app_theme.dart';
-import 'package:learning2/core/widgets/modern_card.dart';
-import 'package:learning2/core/widgets/modern_app_bar.dart';
+import 'package:learning2/core/widgets/glassmorphic_card.dart';
+import 'package:learning2/core/widgets/glassmorphic_app_bar.dart';
+import 'package:learning2/core/widgets/brutalist_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -107,22 +108,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Builds the modern gradient AppBar with enhanced styling.
   PreferredSizeWidget _buildAppBar() {
-    return ModernAppBar(
+    return GlassmorphicAppBar(
       title: 'SPARSH',
-      showBackButton: false,
       actions: [
-        Container(
-          margin: const EdgeInsets.only(right: SparshTheme.spacing8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
-          ),
-          child: IconButton(
-            icon: const Icon(
-              Icons.notifications_outlined,
-              size: 24,
-              color: Colors.white,
-            ),
+          child: BrutalistButton(
             onPressed: () {
               Navigator.push(
                 context,
@@ -131,9 +120,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               );
             },
+            backgroundColor: SparshTheme.brutalistBlack,
+            foregroundColor: SparshTheme.brutalistWhite,
+            padding: const EdgeInsets.all(SparshTheme.spacing8),
+            child: const Icon(Icons.notifications_outlined, size: 20),
           ),
-        ),
-        AnimatedSwitcher(
+        const SizedBox(width: SparshTheme.spacing16),
+      ],
+    );
+  }
+
+  /// Builds the search button with brutalist styling.
+  Widget _buildSearchButton() {
+    return AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           transitionBuilder: (Widget child, Animation<double> animation) {
             return ScaleTransition(scale: animation, child: child);
@@ -741,20 +740,31 @@ class _HomeContentState extends State<HomeContent> {
       child: Row(
         children: [
           Container(
-            width: 4,
-            height: 20,
+            width: 8,
+            height: 32,
             decoration: BoxDecoration(
-              color: SparshTheme.primaryBlue,
-              borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+              color: SparshTheme.brutalistYellow,
+              border: Border.all(
+                color: SparshTheme.brutalistBlack,
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: SparshTheme.brutalistBlack,
+                  offset: const Offset(2, 2),
+                  blurRadius: 0,
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: SparshTheme.spacing12),
+          const SizedBox(width: SparshTheme.spacing16),
           Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: SparshTheme.textPrimary,
-              letterSpacing: 0.5,
+            title.toUpperCase(),
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.0,
             ),
           ),
         ],
@@ -896,28 +906,19 @@ class _HomeContentState extends State<HomeContent> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 64,
-          height: 64,
+          width: 72,
+          height: 72,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                SparshTheme.primaryBlue.withOpacity(0.1),
-                SparshTheme.primaryBlue.withOpacity(0.05),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(SparshTheme.radiusLg),
+            color: SparshTheme.brutalistWhite,
             border: Border.all(
-              color: SparshTheme.primaryBlue.withOpacity(0.2),
-              width: 1,
+              color: SparshTheme.brutalistBlack,
+              width: 3,
             ),
             boxShadow: [
               BoxShadow(
-                color: SparshTheme.primaryBlue.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-                spreadRadius: 0,
+                color: SparshTheme.brutalistBlack,
+                offset: const Offset(4, 4),
+                blurRadius: 0,
               ),
             ],
           ),
@@ -928,20 +929,21 @@ class _HomeContentState extends State<HomeContent> {
             errorBuilder: (context, error, stackTrace) {
               return Icon(
                 Icons.apps_rounded,
-                color: SparshTheme.primaryBlue,
-                size: 28,
+                color: SparshTheme.brutalistBlack,
+                size: 32,
               );
             },
           ),
         ),
-        const SizedBox(height: SparshTheme.spacing10),
+        const SizedBox(height: SparshTheme.spacing12),
         Text(
-          label,
+          label.toUpperCase(),
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: SparshTheme.textPrimary,
-            fontWeight: FontWeight.w500,
-            height: 1.2,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w900,
+            fontSize: 12,
+            letterSpacing: 0.5,
           ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
@@ -950,7 +952,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  /// "Mostly Used Apps" row (unchanged from before):
+  /// Glassmorphic "Mostly Used Apps" with brutalist items
   Widget _mostlyUsedApps(double screenWidth, double screenHeight) {
     final List<Map<String, String>> mostlyUsedItems = [
       {'image': 'assets/image33.png', 'label': 'DSR', 'route': 'dsr'},
@@ -971,8 +973,10 @@ class _HomeContentState extends State<HomeContent> {
       },
     ];
 
-    return ModernCard(
-      padding: const EdgeInsets.all(SparshTheme.spacing20),
+    return GlassmorphicCard(
+      backgroundColor: SparshTheme.glassWhite,
+      borderColor: SparshTheme.glassBorder,
+      blurIntensity: 12.0,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: mostlyUsedItems.map((item) {
@@ -1014,24 +1018,19 @@ class _HomeContentState extends State<HomeContent> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 72,
-            height: 72,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  SparshTheme.primaryBlue,
-                  SparshTheme.primaryBlue.withOpacity(0.8),
-                ],
+              color: SparshTheme.brutalistBlack,
+              border: Border.all(
+                color: SparshTheme.brutalistWhite,
+                width: 3,
               ),
-              borderRadius: BorderRadius.circular(SparshTheme.radiusXl),
               boxShadow: [
                 BoxShadow(
-                  color: SparshTheme.primaryBlue.withOpacity(0.3),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 0,
+                  color: SparshTheme.brutalistYellow,
+                  offset: const Offset(4, 4),
+                  blurRadius: 0,
                 ),
               ],
             ),
@@ -1044,19 +1043,20 @@ class _HomeContentState extends State<HomeContent> {
                 return Icon(
                   Icons.apps_rounded,
                   color: Colors.white,
-                  size: 32,
+                  size: 36,
                 );
               },
             ),
           ),
           const SizedBox(height: SparshTheme.spacing12),
           Text(
-            text,
+            text.toUpperCase(),
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: SparshTheme.textPrimary,
-              fontWeight: FontWeight.w600,
-              height: 1.2,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w900,
+              fontSize: 12,
+              letterSpacing: 0.5,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
@@ -1066,7 +1066,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  /// Modern banner with enhanced styling.
+  /// Glassmorphic banner with brutalist indicators.
   Widget _buildBanner() {
     return Container(
       height: 180,
@@ -1074,7 +1074,7 @@ class _HomeContentState extends State<HomeContent> {
       child: Stack(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(SparshTheme.radiusXl),
+            borderRadius: BorderRadius.circular(20.0),
             child: PageView.builder(
               controller: _pageController,
               itemCount: _bannerImagePaths.length,
@@ -1086,19 +1086,8 @@ class _HomeContentState extends State<HomeContent> {
               itemBuilder: (context, index) {
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: SparshTheme.spacing4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(SparshTheme.radiusXl),
-                    boxShadow: [
-                      BoxShadow(
-                        color: SparshTheme.textPrimary.withOpacity(0.15),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                        spreadRadius: 0,
-                      ),
-                    ],
-                  ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(SparshTheme.radiusXl),
+                    borderRadius: BorderRadius.circular(20.0),
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
@@ -1112,8 +1101,8 @@ class _HomeContentState extends State<HomeContent> {
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                   colors: [
-                                    SparshTheme.primaryBlue,
-                                    SparshTheme.primaryBlue.withOpacity(0.7),
+                                    SparshTheme.brutalistBlue,
+                                    SparshTheme.brutalistBlack,
                                   ],
                                 ),
                               ),
@@ -1129,14 +1118,7 @@ class _HomeContentState extends State<HomeContent> {
                         ),
                         Container(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.3),
-                              ],
-                            ),
+                            color: SparshTheme.glassWhite,
                           ),
                         ),
                       ],
@@ -1154,25 +1136,25 @@ class _HomeContentState extends State<HomeContent> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(_bannerImagePaths.length, (index) {
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: _currentIndex == index ? 24 : 8,
-                    height: 8,
+                  return Container(
+                    width: _currentIndex == index ? 32 : 16,
+                    height: 16,
                     margin: const EdgeInsets.symmetric(horizontal: SparshTheme.spacing4),
                     decoration: BoxDecoration(
                       color: _currentIndex == index
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
-                      boxShadow: _currentIndex == index
-                          ? [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : null,
+                          ? SparshTheme.brutalistYellow
+                          : SparshTheme.brutalistWhite,
+                      border: Border.all(
+                        color: SparshTheme.brutalistBlack,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: SparshTheme.brutalistBlack,
+                          offset: const Offset(2, 2),
+                          blurRadius: 0,
+                        ),
+                      ],
                     ),
                   );
                 }),
@@ -1217,49 +1199,24 @@ class _HorizontalMenuState extends State<HorizontalMenu> {
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                color: isSelected ? SparshTheme.primaryBlue : SparshTheme.surfacePrimary,
-                borderRadius: BorderRadius.circular(SparshTheme.radiusXl),
-                border: Border.all(
-                  color: isSelected 
-                      ? SparshTheme.primaryBlue 
-                      : SparshTheme.borderColor.withOpacity(0.3),
-                  width: 1,
-                ),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: SparshTheme.primaryBlue.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(SparshTheme.radiusXl),
-                  onTap: () {
-                    setState(() {
-                      selected = label;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: SparshTheme.spacing20,
-                      vertical: SparshTheme.spacing10,
-                    ),
-                    child: Text(
-                      label,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: isSelected ? Colors.white : SparshTheme.textPrimary,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      ),
-                    ),
-                  ),
+            child: BrutalistButton(
+              onPressed: () {
+                setState(() {
+                  selected = label;
+                });
+              },
+              backgroundColor: isSelected ? SparshTheme.brutalistBlack : SparshTheme.brutalistWhite,
+              foregroundColor: isSelected ? SparshTheme.brutalistWhite : SparshTheme.brutalistBlack,
+              isSelected: isSelected,
+              borderColor: SparshTheme.brutalistBlack,
+              borderWidth: 3,
+              child: Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  color: isSelected ? SparshTheme.brutalistWhite : SparshTheme.brutalistBlack,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
