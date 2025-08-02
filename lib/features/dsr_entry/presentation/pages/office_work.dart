@@ -8,6 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/document_number_storage.dart';
+import '../../../../core/widgets/modern_card.dart';
+import '../../../../core/widgets/modern_button.dart';
+import '../../../../core/widgets/modern_input.dart';
+import '../../../../core/widgets/modern_app_bar.dart';
 import 'dsr_entry.dart';
 import 'dsr_exception_entry.dart';
 
@@ -536,243 +540,258 @@ class _OfficeWorkState extends State<OfficeWork> {
 
     return Scaffold(
       backgroundColor: SparshTheme.scaffoldBackground,
-      appBar: AppBar(
+      appBar: ModernAppBar(
+        title: 'Office Work',
         leading: IconButton(
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const DsrEntry()),
           ),
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: SparshTheme.textOnPrimary),
         ),
-        title: const Text('Office Work', style: TextStyle(color: Colors.white)),
-        backgroundColor: SparshTheme.primaryBlue,
-        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(SparshSpacing.md),
-        child: Form(
-          key: _formKey,
-          child: ListView(
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(SparshTheme.spacing16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Render dynamic fields
-              // Only handle the Process Type dropdown and Document Number here
-              _buildLabel(_fields[0]['label']),
-              if (_processTypeError != null)
-                Text(_processTypeError!, style: const TextStyle(color: Colors.red)),
-              _isLoadingProcessTypes
-                ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
-                : DropdownButtonFormField<String>(
-                    value: _processItem,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: SparshTheme.cardBackground,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(SparshBorderRadius.md), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: SparshSpacing.sm, vertical: SparshSpacing.sm),
+              ModernCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const ModernCardHeader(
+                      title: 'Process Information',
+                      subtitle: 'Select process type and document details',
+                      leading: Icon(Icons.settings, color: SparshTheme.primaryBlue),
                     ),
-                    items: _processdropdownItems.map((it) => DropdownMenuItem(value: it, child: Text(it))).toList(),
-                    onChanged: (val) async {
-                      setState(() {
-                        _processItem = val;
-                        _fields[0]['value'] = val;
-                      });
-                      if (val == 'Update') await _fetchDocumentNumbers();
-                    },
-                    validator: (v) => v == null || v == 'Select' ? 'Required' : null,
-                  ),
-              if (_processItem == 'Update') ...[
-                const SizedBox(height: 8.0),
-                _loadingDocs
-                  ? const Center(child: CircularProgressIndicator())
-                  : DropdownButtonFormField<String>(
-                      value: _selectedDocuNumb,
-                      decoration: const InputDecoration(labelText: 'Document Number'),
-                      items: _documentNumbers
-                          .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                          .toList(),
-                      onChanged: (v) async {
-                        setState(() => _selectedDocuNumb = v);
-                        if (v != null) await _fetchAndPopulateDetails(v);
-                      },
-                      validator: (v) => v == null ? 'Required' : null,
-                    ),
-              ],
-              if (_fields[0]['value'] == "Update")
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: TextFormField(
-                    controller: _documentNumberController,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      labelText: "Document Number",
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              const SizedBox(height: SparshSpacing.sm),
-              // Render the rest of the fields (text/number)
-              for (final field in _fields.skip(1)) ...[
-                _buildLabel(field['label']),
-                _buildTextField(
-                  field['label'],
-                  controller: field['controller'],
-                  keyboardType: field['type'] == 'number' ? TextInputType.number : TextInputType.text,
-                  maxLines: field['maxLines'] ?? 1,
-                ),
-                const SizedBox(height: SparshSpacing.sm),
-              ],
-              _buildLabel('Submission Date'),
-              TextFormField(
-                controller: _submissionDateController,
-                readOnly: true,
-                enabled: false,
-                decoration: InputDecoration(
-                  hintText: 'Submission Date',
-                  filled: true,
-                  fillColor: SparshTheme.cardBackground,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(SparshBorderRadius.md),
-                    borderSide: BorderSide.none,
-                  ),
-                  suffixIcon: const Icon(Icons.lock, color: Colors.grey),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: SparshSpacing.sm, vertical: SparshSpacing.sm),
-                ),
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
-              ),
-              const SizedBox(height: SparshSpacing.sm),
-              _buildLabel('Report Date'),
-              TextFormField(
-                controller: _reportDateController,
-                readOnly: true,
-                onTap: _pickReportDate,
-                decoration: InputDecoration(
-                  hintText: 'Select Report Date',
-                  filled: true,
-                  fillColor: SparshTheme.cardBackground,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(SparshBorderRadius.md),
-                    borderSide: BorderSide.none,
-                  ),
-                  suffixIcon: const Icon(Icons.calendar_today),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: SparshSpacing.sm, vertical: SparshSpacing.sm),
-                ),
-                validator: (val) => val == null || val.isEmpty ? 'Required' : null,
-              ),
-              const SizedBox(height: SparshSpacing.sm),
-              _buildLabel('Upload Images'),
-              ...List.generate(_selectedImages.length, (i) {
-                final file = _selectedImages[i];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: SparshSpacing.md),
-                  padding: const EdgeInsets.all(SparshSpacing.sm),
-                  decoration: BoxDecoration(
-                    color: SparshTheme.cardBackground,
-                    borderRadius: BorderRadius.circular(SparshBorderRadius.md),
-                    border: Border.all(
-                      color: file != null ? SparshTheme.successGreen : SparshTheme.borderGrey,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Document ${i + 1}',
-                            style: SparshTypography.bodyBold,
+                    const SizedBox(height: SparshTheme.spacing16),
+                    if (_processTypeError != null)
+                      Container(
+                        padding: const EdgeInsets.all(SparshTheme.spacing12),
+                        decoration: BoxDecoration(
+                          color: SparshTheme.errorRed.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+                        ),
+                        child: Text(_processTypeError!, style: const TextStyle(color: SparshTheme.errorRed)),
+                      ),
+                    if (_processTypeError != null) const SizedBox(height: SparshTheme.spacing12),
+                    _isLoadingProcessTypes
+                      ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                      : ModernDropdown<String>(
+                          label: _fields[0]['label'],
+                          value: _processItem,
+                          items: _processdropdownItems.map((it) => DropdownMenuItem(value: it, child: Text(it))).toList(),
+                          onChanged: (val) async {
+                            setState(() {
+                              _processItem = val;
+                              _fields[0]['value'] = val;
+                            });
+                            if (val == 'Update') await _fetchDocumentNumbers();
+                          },
+                        ),
+                    if (_processItem == 'Update') ...[
+                      const SizedBox(height: SparshTheme.spacing16),
+                      _loadingDocs
+                        ? const Center(child: CircularProgressIndicator())
+                        : ModernDropdown<String>(
+                            label: 'Document Number',
+                            value: _selectedDocuNumb,
+                            items: _documentNumbers
+                                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                                .toList(),
+                            onChanged: (v) async {
+                              setState(() => _selectedDocuNumb = v);
+                              if (v != null) await _fetchAndPopulateDetails(v);
+                            },
                           ),
-                          const Spacer(),
-                          if (file != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: SparshSpacing.sm, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: SparshTheme.successGreen.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(SparshBorderRadius.xl),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.check_circle, color: SparshTheme.successGreen, size: 16),
-                                  const SizedBox(width: SparshSpacing.xs),
-                                  Text(
-                                    'Uploaded',
-                                    style: SparshTypography.labelMedium.copyWith(
-                                      color: SparshTheme.successGreen,
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: SparshTheme.spacing16),
+              ModernCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const ModernCardHeader(
+                      title: 'Activity Details',
+                      subtitle: 'Enter work-related information',
+                      leading: Icon(Icons.work, color: SparshTheme.primaryBlue),
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    // Render the rest of the fields (text/number)
+                    for (final field in _fields.skip(1)) ...[
+                      ModernInput(
+                        label: field['label'],
+                        controller: field['controller'],
+                        keyboardType: field['type'] == 'number' ? TextInputType.number : TextInputType.text,
+                        maxLines: field['maxLines'] ?? 1,
+                      ),
+                      const SizedBox(height: SparshTheme.spacing16),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: SparshTheme.spacing16),
+              ModernCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const ModernCardHeader(
+                      title: 'Date Information',
+                      subtitle: 'Submission and report dates',
+                      leading: Icon(Icons.calendar_today, color: SparshTheme.primaryBlue),
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Submission Date',
+                      controller: _submissionDateController,
+                      readOnly: true,
+                      enabled: false,
+                      suffixIcon: const Icon(Icons.lock, color: Colors.grey),
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Report Date',
+                      controller: _reportDateController,
+                      readOnly: true,
+                      onTap: _pickReportDate,
+                      suffixIcon: const Icon(Icons.calendar_today),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: SparshTheme.spacing16),
+              ModernCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const ModernCardHeader(
+                      title: 'Upload Images',
+                      subtitle: 'Add supporting documents',
+                      leading: Icon(Icons.photo_library, color: SparshTheme.primaryBlue),
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ...List.generate(_selectedImages.length, (i) {
+                      final file = _selectedImages[i];
+                      return ModernCard(
+                        margin: const EdgeInsets.only(bottom: SparshTheme.spacing12),
+                        backgroundColor: file != null ? SparshTheme.successGreen.withOpacity(0.05) : SparshTheme.surfaceSecondary,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'Document ${i + 1}',
+                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: SparshTheme.textPrimary,
+                                  ),
+                                ),
+                                const Spacer(),
+                                if (file != null)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: SparshTheme.spacing8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: SparshTheme.successGreen.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(SparshTheme.radiusXl),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.check_circle, color: SparshTheme.successGreen, size: 16),
+                                        const SizedBox(width: SparshTheme.spacing4),
+                                        Text(
+                                          'Uploaded',
+                                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                            color: SparshTheme.successGreen,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                              ],
                             ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () => _pickImage(i),
-                              icon: Icon(file != null ? Icons.refresh : Icons.upload_file, size: 18),
-                              label: Text(file != null ? 'Replace' : 'Upload'),
+                            const SizedBox(height: SparshTheme.spacing12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ModernButton(
+                                    text: file != null ? 'Replace' : 'Upload',
+                                    icon: Icon(file != null ? Icons.refresh : Icons.upload_file, size: 18),
+                                    onPressed: () => _pickImage(i),
+                                    type: ModernButtonType.outline,
+                                  ),
+                                ),
+                                if (file != null) ...[
+                                  const SizedBox(width: SparshTheme.spacing8),
+                                  Expanded(
+                                    child: ModernButton(
+                                      text: 'View',
+                                      icon: const Icon(Icons.visibility, size: 18),
+                                      onPressed: () => _showImageDialog(file),
+                                      type: ModernButtonType.success,
+                                    ),
+                                  ),
+                                  const SizedBox(width: SparshTheme.spacing8),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedImages.removeAt(i);
+                                      });
+                                    },
+                                    icon: const Icon(Icons.remove_circle_outline, color: SparshTheme.errorRed),
+                                  ),
+                                ]
+                              ],
                             ),
-                          ),
-                          if (file != null) ...[
-                            const SizedBox(width: SparshSpacing.sm),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: () => _showImageDialog(file),
-                                icon: const Icon(Icons.visibility, size: 18),
-                                label: const Text('View'),
-                                style: ElevatedButton.styleFrom(backgroundColor: SparshTheme.successGreen),
-                              ),
-                            ),
-                            const SizedBox(width: SparshSpacing.sm),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _selectedImages.removeAt(i);
-                                });
-                              },
-                              icon: const Icon(Icons.remove_circle_outline, color: SparshTheme.errorRed),
-                            ),
-                          ]
-                        ],
+                          ],
+                        ),
+                      );
+                    }),
+                    if (_selectedImages.length < 3) ...[
+                      const SizedBox(height: SparshTheme.spacing12),
+                      Center(
+                        child: ModernButton(
+                          text: 'Add More Image',
+                          icon: const Icon(Icons.add_photo_alternate),
+                          onPressed: () {
+                            setState(() {
+                              _selectedImages.add(null);
+                            });
+                          },
+                          type: ModernButtonType.outline,
+                        ),
                       ),
                     ],
-                  ),
-                );
-              }),
-              if (_selectedImages.length < 3)
-                Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _selectedImages.add(null);
-                      });
-                    },
-                    icon: const Icon(Icons.add_photo_alternate),
-                    label: const Text('Add More Image'),
-                  ),
+                  ],
                 ),
-              const SizedBox(height: SparshSpacing.lg),
+              ),
+              const SizedBox(height: SparshTheme.spacing24),
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton(
+                    child: ModernButton(
+                      text: 'Submit & New',
                       onPressed: () => _onSubmit(exitAfter: false),
-                      child: const Text('Submit & New'),
+                      type: ModernButtonType.secondary,
                     ),
                   ),
-                  const SizedBox(width: SparshSpacing.sm),
+                  const SizedBox(width: SparshTheme.spacing12),
                   Expanded(
-                    child: ElevatedButton(
+                    child: ModernButton(
+                      text: 'Submit & Exit',
                       onPressed: () => _onSubmit(exitAfter: true),
-                      child: const Text('Submit & Exit'),
+                      type: ModernButtonType.primary,
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: SparshTheme.spacing16),
             ],
           ),
         ),

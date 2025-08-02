@@ -8,6 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/document_number_storage.dart';
+import '../../../../core/widgets/modern_card.dart';
+import '../../../../core/widgets/modern_button.dart';
+import '../../../../core/widgets/modern_input.dart';
+import '../../../../core/widgets/modern_app_bar.dart';
 import 'dsr_entry.dart';
 import 'dsr_exception_entry.dart';
 
@@ -457,29 +461,17 @@ class _WorkFromHomeState extends State<WorkFromHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+      backgroundColor: SparshTheme.scaffoldBackground,
+      appBar: ModernAppBar(
+        title: 'Work From Home',
         leading: IconButton(
           onPressed: () => Navigator.push(
               context, MaterialPageRoute(builder: (_) => const DsrEntry())),
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 22),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Work From Home',
-              style: SparshTypography.heading2.copyWith(color: Colors.black),
-            ),
-            Text(
-              'Daily Sales Report Entry',
-              style: SparshTypography.body.copyWith(color: Colors.black54),
-            ),
-          ],
+          icon: const Icon(Icons.arrow_back_ios_new, color: SparshTheme.textOnPrimary),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline, color: Colors.black, size: 24),
+            icon: const Icon(Icons.help_outline, color: SparshTheme.textOnPrimary, size: 24),
             onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Help information for Work From Home'),
@@ -488,51 +480,39 @@ class _WorkFromHomeState extends State<WorkFromHome> {
             ),
           )
         ],
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(SparshSpacing.md),
+          padding: const EdgeInsets.all(SparshTheme.spacing16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-                              // ─── Process Section ──────────────────────────────────────────────
-                Container(
-                  margin: const EdgeInsets.only(top: 20, bottom: SparshSpacing.md),
-                  padding: const EdgeInsets.all(SparshSpacing.md),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                    boxShadow: SparshShadows.sm,
-                  ),
+              ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Process',
-                      style: SparshTypography.heading5.copyWith(color: SparshTheme.textPrimary),
+                    const ModernCardHeader(
+                      title: 'Process Information',
+                      subtitle: 'Select process type and document details',
+                      leading: Icon(Icons.settings, color: SparshTheme.primaryBlue),
                     ),
-                    const SizedBox(height: SparshSpacing.sm),
+                    const SizedBox(height: SparshTheme.spacing16),
                     if (_processTypeError != null)
-                      Text(_processTypeError!, style: const TextStyle(color: Colors.red)),
+                      Container(
+                        padding: const EdgeInsets.all(SparshTheme.spacing12),
+                        decoration: BoxDecoration(
+                          color: SparshTheme.errorRed.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+                        ),
+                        child: Text(_processTypeError!, style: const TextStyle(color: SparshTheme.errorRed)),
+                      ),
+                    if (_processTypeError != null) const SizedBox(height: SparshTheme.spacing12),
                     _isLoadingProcessTypes
                       ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
-                      : DropdownButtonFormField<String>(
+                      : ModernDropdown<String>(
+                          label: 'Process Type',
                           value: _processItem,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: SparshTheme.cardBackground,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: SparshSpacing.md, vertical: SparshSpacing.sm),
-                            isCollapsed: true,
-                          ),
-                          isExpanded: true,
                           items: _processdropdownItems
                               .map((item) => DropdownMenuItem(
                                     value: item,
@@ -545,15 +525,14 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                             });
                             if (val == 'Update') await _fetchDocumentNumbers();
                           },
-                          validator: (v) => v == null || v == 'Select' ? 'Required' : null,
                         ),
                     if (_processItem == 'Update') ...[
-                      const SizedBox(height: 8.0),
+                      const SizedBox(height: SparshTheme.spacing16),
                       _loadingDocs
                         ? const Center(child: CircularProgressIndicator())
-                        : DropdownButtonFormField<String>(
+                        : ModernDropdown<String>(
+                            label: 'Document Number',
                             value: _selectedDocuNumb,
-                            decoration: const InputDecoration(labelText: 'Document Number'),
                             items: _documentNumbers
                                 .map((d) => DropdownMenuItem(value: d, child: Text(d)))
                                 .toList(),
@@ -561,196 +540,101 @@ class _WorkFromHomeState extends State<WorkFromHome> {
                               setState(() => _selectedDocuNumb = v);
                               if (v != null) await _fetchAndPopulateDetails(v);
                             },
-                            validator: (v) => v == null ? 'Required' : null,
                           ),
                     ],
                   ],
                 ),
               ),
+              const SizedBox(height: SparshTheme.spacing16),
 
-                              // ─── Date Section ─────────────────────────────────────────────────
-                Container(
-                  margin: const EdgeInsets.only(top: 20, bottom: SparshSpacing.md),
-                  padding: const EdgeInsets.all(SparshSpacing.md),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                    boxShadow: SparshShadows.sm,
-                  ),
+              ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Submission Date',
-                      style: SparshTypography.heading5.copyWith(color: SparshTheme.textPrimary),
+                    const ModernCardHeader(
+                      title: 'Date Information',
+                      subtitle: 'Submission and report dates',
+                      leading: Icon(Icons.calendar_today, color: SparshTheme.primaryBlue),
                     ),
-                    const SizedBox(height: SparshSpacing.sm),
-                    TextFormField(
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Submission Date',
                       controller: _submissionDateController,
                       readOnly: true,
                       enabled: false,
-                      decoration: InputDecoration(
-                        hintText: 'Submission Date',
-                        filled: true,
-                        fillColor: SparshTheme.cardBackground,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: SparshSpacing.md, vertical: SparshSpacing.sm),
-                        isCollapsed: true,
-                        suffixIcon: const Icon(Icons.lock, color: Colors.grey),
-                      ),
-                      validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                      suffixIcon: const Icon(Icons.lock, color: Colors.grey),
                     ),
-                    const SizedBox(height: SparshSpacing.md),
-                    Text(
-                      'Report Date',
-                      style: SparshTypography.heading5.copyWith(color: SparshTheme.textPrimary),
-                    ),
-                    const SizedBox(height: SparshSpacing.sm),
-                    TextFormField(
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Report Date',
                       controller: _reportDateController,
                       readOnly: true,
                       onTap: _pickReportDate,
-                      decoration: InputDecoration(
-                        hintText: 'Select Report Date',
-                        filled: true,
-                        fillColor: SparshTheme.cardBackground,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: SparshSpacing.md, vertical: SparshSpacing.sm),
-                        isCollapsed: true,
-                        suffixIcon: const Icon(Icons.calendar_today, size: SparshIconSize.md),
-                      ),
-                      validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+                      suffixIcon: const Icon(Icons.calendar_today),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: SparshTheme.spacing16),
 
-                              // ─── NEW: Activity Details Section ───────────────────────────────
-                Container(
-                  margin: const EdgeInsets.only(top: 20, bottom: SparshSpacing.md),
-                  padding: const EdgeInsets.all(SparshSpacing.md),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                    boxShadow: SparshShadows.sm,
-                  ),
+              ModernCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Activity Details',
-                      style: SparshTypography.heading5.copyWith(color: SparshTheme.textPrimary),
+                    const ModernCardHeader(
+                      title: 'Activity Details',
+                      subtitle: 'Enter work-from-home activities',
+                      leading: Icon(Icons.work_from_home, color: SparshTheme.primaryBlue),
                     ),
-                    const SizedBox(height: SparshSpacing.sm),
-                    TextFormField(
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Activity Details 1',
                       controller: _activityDetails1Controller,
                       maxLines: 3,
-                      decoration: _multilineDecoration.copyWith(
-                        hintText: 'Activity Details 1',
-                      ),
-                      validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Required' : null,
                     ),
-                    const SizedBox(height: SparshSpacing.md),
-                    Text(
-                      'Activity Details 2',
-                      style: SparshTypography.heading5.copyWith(color: SparshTheme.textPrimary),
-                    ),
-                    const SizedBox(height: SparshSpacing.sm),
-                    TextFormField(
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Activity Details 2',
                       controller: _activityDetails2Controller,
                       maxLines: 3,
-                      decoration: _multilineDecoration.copyWith(
-                        hintText: 'Activity Details 2',
-                      ),
                     ),
-                    const SizedBox(height: SparshSpacing.md),
-                    Text(
-                      'Activity Details 3',
-                      style: SparshTypography.heading5.copyWith(color: SparshTheme.textPrimary),
-                    ),
-                    const SizedBox(height: SparshSpacing.sm),
-                    TextFormField(
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Activity Details 3',
                       controller: _activityDetails3Controller,
                       maxLines: 3,
-                      decoration: _multilineDecoration.copyWith(
-                        hintText: 'Activity Details 3',
-                      ),
                     ),
-                    const SizedBox(height: SparshSpacing.md),
-                    Text(
-                      'Other Points',
-                      style: SparshTypography.heading5.copyWith(color: SparshTheme.textPrimary),
-                    ),
-                    const SizedBox(height: SparshSpacing.sm),
-                    TextFormField(
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Other Points',
                       controller: _otherPointsController,
                       maxLines: 3,
-                      decoration: _multilineDecoration.copyWith(
-                        hintText: 'Other Points',
-                      ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: SparshTheme.spacing24),
 
-              // ─── Upload Supporting Documents ──────────────────────────────────
-              
-
-              // ─── Submit Button Card ─────────────────────────────────────────
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                  boxShadow: SparshShadows.sm,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () => _onSubmit(exitAfter: false),
+              Row(
+                children: [
+                  Expanded(
+                    child: ModernButton(
+                      text: 'Submit & New',
                       icon: const Icon(Icons.check_circle_outline),
-                      label: const Text('Submit'),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: SparshTheme.primaryBlueAccent,
-                        elevation: 3.0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(SparshBorderRadius.sm)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        textStyle: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
+                      onPressed: () => _onSubmit(exitAfter: false),
+                      type: ModernButtonType.secondary,
                     ),
-                    const SizedBox(height: SparshSpacing.md),
-                    OutlinedButton.icon(
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const DsrEntry())),
-                      icon: const Icon(Icons.arrow_back),
-                      label: const Text('Back to DSR Entry'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: SparshTheme.primaryBlueAccent,
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                            side: const BorderSide(color: SparshTheme.primaryBlueAccent)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        textStyle: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                        elevation: 1.0,
-                      ),
+                  ),
+                  const SizedBox(width: SparshTheme.spacing12),
+                  Expanded(
+                    child: ModernButton(
+                      text: 'Submit & Exit',
+                      icon: const Icon(Icons.check_circle),
+                      onPressed: () => _onSubmit(exitAfter: true),
+                      type: ModernButtonType.primary,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 30),
