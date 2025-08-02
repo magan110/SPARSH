@@ -8,6 +8,10 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../../core/utils/document_number_storage.dart';
+import '../../../../core/widgets/modern_card.dart';
+import '../../../../core/widgets/modern_button.dart';
+import '../../../../core/widgets/modern_input.dart';
+import '../../../../core/widgets/modern_app_bar.dart';
 import 'dsr_entry.dart';
 import 'dsr_exception_entry.dart';
 
@@ -479,9 +483,9 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: SparshTheme.lightGreyBackground,
-      appBar: AppBar(
-        title: const Text('Any Other Activity'),
-        backgroundColor: SparshTheme.primaryBlueAccent,
+      appBar: const ModernAppBar(
+        title: 'Any Other Activity',
+        showBackButton: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(SparshSpacing.md),
@@ -491,79 +495,74 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Activity Information ───────────────────────────
-              Container(
-                decoration: BoxDecoration(
-                  color: SparshTheme.cardBackground,
-                  borderRadius: BorderRadius.circular(SparshBorderRadius.md),
-                  boxShadow: SparshShadows.card,
-                ),
-                padding: const EdgeInsets.all(SparshSpacing.md),
+              ModernCard(
+                title: 'Activity Information',
+                icon: Icons.info_outline,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel(context, 'Activity Information'),
-                    const SizedBox(height: SparshSpacing.sm),
-                    _buildLabel(context, 'Process Type'),
                     if (_processTypeError != null)
-                      Text(_processTypeError!, style: const TextStyle(color: Colors.red)),
+                      Container(
+                        padding: const EdgeInsets.all(SparshTheme.spacing12),
+                        margin: const EdgeInsets.only(bottom: SparshTheme.spacing16),
+                        decoration: BoxDecoration(
+                          color: SparshTheme.errorRed.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+                          border: Border.all(color: SparshTheme.errorRed.withOpacity(0.3)),
+                        ),
+                        child: Text(_processTypeError!, style: const TextStyle(color: SparshTheme.errorRed)),
+                      ),
                     _isLoadingProcessTypes
                       ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
-                      : _buildDropdown(
-                          value: _processItem,
-                          items: _processdropdownItems,
+                      : ModernDropdown<String>(
+                          label: 'Process Type',
+                          value: _processItem == 'Select' ? null : _processItem,
+                          items: _processdropdownItems.where((item) => item != 'Select').map((item) => 
+                            DropdownMenuItem(value: item, child: Text(item))
+                          ).toList(),
                           onChanged: (val) async {
-                            setState(() => _processItem = val);
+                            setState(() => _processItem = val ?? 'Select');
                             if (val == 'Update') await _fetchDocumentNumbers();
                           },
-                          validator: (v) => v == null || v == 'Select' ? 'Required' : null,
+                          validator: (v) => v == null ? 'Please select a process type' : null,
                           enabled: _processdropdownItems.length > 1,
                         ),
                     if (_processItem == 'Update') ...[
-                      const SizedBox(height: SparshSpacing.sm),
+                      const SizedBox(height: SparshTheme.spacing16),
                       _loadingDocs
                         ? const Center(child: CircularProgressIndicator())
-                        : DropdownButtonFormField<String>(
+                        : ModernDropdown<String>(
+                            label: 'Document Number',
                             value: _selectedDocuNumb,
-                            decoration: const InputDecoration(labelText: 'Document Number'),
-                            items: _documentNumbers
-                                .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                                .toList(),
+                            items: _documentNumbers.map((d) => 
+                              DropdownMenuItem(value: d, child: Text(d))
+                            ).toList(),
                             onChanged: (v) async {
                               setState(() => _selectedDocuNumb = v);
-                          
                             },
-                            validator: (v) => v == null ? 'Required' : null,
-                          ),  
+                            validator: (v) => v == null ? 'Please select a document number' : null,
+                          ),
                     ],
-                    const SizedBox(height: SparshSpacing.sm),
-                    _buildLabel(context, 'Submission Date'),
-                    TextFormField(
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Submission Date',
                       controller: _dateController,
                       readOnly: true,
                       enabled: false,
-                      decoration: InputDecoration(
-                        hintText: 'Submission Date',
-                        filled: true,
-                        fillColor: SparshTheme.lightGreyBackground,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(SparshBorderRadius.sm),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: SparshSpacing.md,
-                          vertical: SparshSpacing.sm,
-                        ),
-                        suffixIcon: const Icon(Icons.lock, color: Colors.grey),
-                      ),
+                      suffixIcon: const Icon(Icons.lock, color: SparshTheme.textSecondary),
                       validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                     ),
-                    const SizedBox(height: SparshSpacing.sm),
-                    _buildLabel(context, 'Report Date'),
-                    _buildDateField(
-                      _reportDateController,
-                      _pickReportDate,
-                      'Select Date',
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Report Date',
+                      controller: _reportDateController,
+                      readOnly: true,
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today, color: SparshTheme.primaryBlue),
+                        onPressed: _pickReportDate,
+                      ),
+                      onTap: _pickReportDate,
+                      validator: (v) => v == null || v.isEmpty ? 'Please select a report date' : null,
                     ),
                   ],
                 ),
@@ -572,26 +571,39 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               const SizedBox(height: SparshSpacing.md),
 
               // ── Activity Details ───────────────────────────────
-              Container(
-                decoration: BoxDecoration(
-                  color: SparshTheme.cardBackground,
-                  borderRadius: BorderRadius.circular(SparshBorderRadius.md),
-                  boxShadow: SparshShadows.card,
-                ),
-                padding: const EdgeInsets.all(SparshSpacing.md),
+              ModernCard(
+                title: 'Activity Details',
+                icon: Icons.assignment_outlined,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLabel(context, 'Activity Details'),
-                    const SizedBox(height: SparshSpacing.sm),
-                    _buildMultilineField('Activity Details 1', _activity1Controller, 3),
-                    const SizedBox(height: SparshSpacing.sm),
-                    _buildMultilineField('Activity Details 2', _activity2Controller, 3),
-                    const SizedBox(height: SparshSpacing.sm),
-                    _buildMultilineField('Activity Details 3', _activity3Controller, 3),
-                    const SizedBox(height: SparshSpacing.sm),
-                    _buildLabel(context, 'Any Other Points'),
-                    _buildMultilineField('Any Other Points', _anyOtherPointsController, 3),
+                    ModernInput(
+                      label: 'Activity Details 1',
+                      controller: _activity1Controller,
+                      maxLines: 3,
+                      prefixIcon: const Icon(Icons.description_outlined, color: SparshTheme.primaryBlue),
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Activity Details 2',
+                      controller: _activity2Controller,
+                      maxLines: 3,
+                      prefixIcon: const Icon(Icons.description_outlined, color: SparshTheme.primaryBlue),
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Activity Details 3',
+                      controller: _activity3Controller,
+                      maxLines: 3,
+                      prefixIcon: const Icon(Icons.description_outlined, color: SparshTheme.primaryBlue),
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Any Other Points',
+                      controller: _anyOtherPointsController,
+                      maxLines: 3,
+                      prefixIcon: const Icon(Icons.note_add_outlined, color: SparshTheme.primaryBlue),
+                    ),
                   ],
                 ),
               ),
@@ -599,81 +611,95 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               const SizedBox(height: SparshSpacing.md),
 
               // ── Supporting Documents ─────────────────────────────
-              Container(
-                decoration: BoxDecoration(
-                  color: SparshTheme.cardBackground,
-                  borderRadius: BorderRadius.circular(SparshBorderRadius.md),
-                  boxShadow: SparshShadows.card,
-                ),
-                padding: const EdgeInsets.all(SparshSpacing.md),
+              ModernCard(
+                title: 'Supporting Documents',
+                icon: Icons.photo_library_rounded,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.photo_library_rounded,
-                            color: SparshTheme.primaryBlueAccent,
-                            size: SparshIconSize.lg),
-                        const SizedBox(width: SparshSpacing.sm),
-                        Expanded(
-                          child: Text(
-                            'Supporting Documents',
-                            style: Theme.of(context).textTheme.headlineSmall,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
+                    Text(
+                      'Upload up to 3 images related to your activity',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: SparshTheme.textSecondary,
+                      ),
                     ),
-                    const SizedBox(height: SparshSpacing.sm),
+                    const SizedBox(height: SparshTheme.spacing16),
                     ..._uploadRows.map((idx) {
                       final file = _selectedImages[idx];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: SparshSpacing.md),
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: SparshTheme.spacing16),
+                        padding: const EdgeInsets.all(SparshTheme.spacing16),
+                        decoration: BoxDecoration(
+                          color: SparshTheme.surfaceSecondary,
+                          borderRadius: BorderRadius.circular(SparshTheme.radiusMd),
+                          border: Border.all(color: SparshTheme.borderColor),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Document ${idx + 1}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium!
-                                    .copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: SparshSpacing.xs),
                             Row(
                               children: [
-                                ElevatedButton.icon(
-                                  onPressed: () => _pickImage(idx),
-                                  icon: Icon(file != null ? Icons.refresh : Icons.upload_file),
-                                  label: Text(file != null ? 'Replace' : 'Upload'),
+                                Icon(
+                                  file != null ? Icons.image : Icons.image_outlined,
+                                  color: SparshTheme.primaryBlue,
+                                  size: 20,
                                 ),
-                                const SizedBox(width: SparshSpacing.sm),
-                                if (file != null)
-                                  ElevatedButton.icon(
-                                    onPressed: () => _showImageDialog(file),
-                                    icon: const Icon(Icons.visibility),
-                                    label: const Text('View'),
+                                const SizedBox(width: SparshTheme.spacing8),
+                                Text(
+                                  'Document ${idx + 1}',
+                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: SparshTheme.textPrimary,
                                   ),
+                                ),
                                 const Spacer(),
                                 if (_uploadRows.length > 1 && idx == _uploadRows.last)
                                   IconButton(
+                                    icon: const Icon(Icons.remove_circle_outline, color: SparshTheme.errorRed),
                                     onPressed: _removeRow,
-                                    icon: const Icon(Icons.remove_circle),
-                                    color: SparshTheme.errorRed,
+                                    tooltip: 'Remove document',
                                   ),
+                              ],
+                            ),
+                            const SizedBox(height: SparshTheme.spacing12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ModernButton(
+                                    text: file != null ? 'Replace' : 'Upload',
+                                    onPressed: () => _pickImage(idx),
+                                    type: file != null ? ModernButtonType.secondary : ModernButtonType.primary,
+                                    icon: Icon(file != null ? Icons.refresh : Icons.upload_file),
+                                  ),
+                                ),
+                                if (file != null) ...[
+                                  const SizedBox(width: SparshTheme.spacing12),
+                                  Expanded(
+                                    child: ModernButton(
+                                      text: 'View',
+                                      onPressed: () => _showImageDialog(file),
+                                      type: ModernButtonType.outline,
+                                      icon: const Icon(Icons.visibility),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ],
                         ),
                       );
                     }),
-                    if (_uploadRows.length < 3)
+                    if (_uploadRows.length < 3) ...[
+                      const SizedBox(height: SparshTheme.spacing16),
                       Center(
-                        child: TextButton.icon(
-                          onPressed: _addRow,
+                        child: ModernButton(
+                          text: 'Add More Image',
                           icon: const Icon(Icons.add_photo_alternate),
-                          label: const Text('Add More Image'),
+                          onPressed: _addRow,
+                          type: ModernButtonType.outline,
                         ),
                       ),
+                    ],
                   ],
                 ),
               ),
@@ -681,15 +707,20 @@ class _AnyOtherActivityState extends State<AnyOtherActivity> {
               const SizedBox(height: SparshSpacing.lg),
 
               // ── Submit Buttons ────────────────────────────────────
-              ElevatedButton(
+              ModernButton(
+                text: _processItem == 'Update' ? 'Update & New' : 'Submit & New',
                 onPressed: () => _onSubmit(exitAfter: false),
-                child: Text(_processItem == 'Update' ? 'Update & New' : 'Submit & New'),
+                type: ModernButtonType.secondary,
+                isFullWidth: true,
+                icon: const Icon(Icons.add_circle_outline),
               ),
-              const SizedBox(height: SparshSpacing.sm),
-              ElevatedButton(
+              const SizedBox(height: SparshTheme.spacing16),
+              ModernButton(
+                text: _processItem == 'Update' ? 'Update & Exit' : 'Submit & Exit',
                 onPressed: () => _onSubmit(exitAfter: true),
-                style: ElevatedButton.styleFrom(backgroundColor: SparshTheme.successGreen),
-                child: Text(_processItem == 'Update' ? 'Update & Exit' : 'Submit & Exit'),
+                type: ModernButtonType.success,
+                isFullWidth: true,
+                icon: const Icon(Icons.check_circle_outline),
               ),
             ],
           ),

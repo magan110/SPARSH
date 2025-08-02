@@ -5,10 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/io_client.dart';
+import 'package:learning2/core/theme/app_theme.dart';
+import 'package:learning2/core/widgets/modern_card.dart';
+import 'package:learning2/core/widgets/modern_button.dart';
+import 'package:learning2/core/widgets/modern_input.dart';
 import 'package:learning2/features/worker/presentation/pages/Worker_Home_Screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:learning2/features/dashboard/presentation/pages/home_screen.dart';
-// Import your worker screen here
 import 'log_in_otp.dart';
 import 'package:learning2/core/constants/fonts.dart';
 
@@ -312,288 +315,119 @@ class _LoginScreenState extends State<LoginScreen>
                       const SizedBox(height: 40),
 
                       // Login Card
-                      Card(
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(30),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Colors.white, Colors.grey.shade50],
-                            ),
-                          ),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Welcome Back',
-                                  style: Fonts.bodyBold.copyWith(
-                                    fontSize: 26,
-                                    color: Colors.blue.shade800,
-                                  ),
+                      ModernCard(
+                        padding: const EdgeInsets.all(SparshTheme.spacing32),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome Back',
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: SparshTheme.primaryBlue,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Sign in to continue',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade600,
-                                  ),
+                              ),
+                              const SizedBox(height: SparshTheme.spacing8),
+                              Text(
+                                'Sign in to continue',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: SparshTheme.textSecondary,
                                 ),
-                                const SizedBox(height: 30),
+                              ),
+                              const SizedBox(height: SparshTheme.spacing32),
 
-                                // Username Field
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade50,
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.shade200,
-                                        blurRadius: 10,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
-                                  child: TextFormField(
-                                    controller: _usernameController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Username',
-                                      hintStyle: TextStyle(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                      prefixIcon: Icon(
-                                        Icons.person_outline,
-                                        color: Colors.blue.shade700,
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      filled: true,
-                                      fillColor: Colors.grey.shade50,
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                        vertical: 16,
-                                        horizontal: 20,
-                                      ),
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your username';
-                                      }
-                                      return null;
-                                    },
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.deny(
-                                        RegExp(r'\s'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
+                              // Username Field
+                              ModernInput(
+                                label: 'Username',
+                                controller: _usernameController,
+                                prefixIcon: const Icon(Icons.person_outline, color: SparshTheme.primaryBlue),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your username';
+                                  }
+                                  return null;
+                                },
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                                ],
+                              ),
+                              const SizedBox(height: SparshTheme.spacing20),
 
-                                // Password Field
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade50,
-                                    borderRadius: BorderRadius.circular(15),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.shade200,
-                                        blurRadius: 10,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
+                              // Password Field
+                              ModernInput(
+                                label: 'Password',
+                                controller: _passwordController,
+                                obscureText: _obscurePassword,
+                                prefixIcon: const Icon(Icons.lock_outline, color: SparshTheme.primaryBlue),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                    color: SparshTheme.textSecondary,
                                   ),
-                                  child: TextFormField(
-                                    controller: _passwordController,
-                                    obscureText: _obscurePassword,
-                                    decoration: InputDecoration(
-                                      hintText: 'Password',
-                                      hintStyle: TextStyle(
-                                        color: Colors.grey.shade400,
-                                      ),
-                                      prefixIcon: Icon(
-                                        Icons.lock_outline,
-                                        color: Colors.blue.shade700,
-                                      ),
-                                      suffixIcon: IconButton(
-                                        icon: Icon(
-                                          _obscurePassword
-                                              ? Icons.visibility_outlined
-                                              : Icons.visibility_off_outlined,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            _obscurePassword =
-                                            !_obscurePassword;
-                                          });
-                                        },
-                                      ),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      filled: true,
-                                      fillColor: Colors.grey.shade50,
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(
-                                        vertical: 16,
-                                        horizontal: 20,
-                                      ),
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your password';
-                                      }
-                                      if (value.length < 6) {
-                                        return 'Password must be at least 6 characters';
-                                      }
-                                      return null;
-                                    },
-                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
                                 ),
-                                const SizedBox(height: 15),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your password';
+                                  }
+                                  if (value.length < 6) {
+                                    return 'Password must be at least 6 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: SparshTheme.spacing16),
 
-                                // Remember me checkbox and Forgot Password
-                                Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        // Forgot password functionality
-                                      },
-                                      style: TextButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                        ),
-                                        minimumSize: Size.zero,
-                                        tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                      ),
-                                      child: Text(
-                                        'Forgot Password?',
-                                        style: Fonts.body.copyWith(
-                                          fontSize: 14,
-                                          color: Colors.blue.shade700,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              // Forgot Password
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: ModernButton(
+                                  text: 'Forgot Password?',
+                                  onPressed: () {
+                                    // Forgot password functionality
+                                  },
+                                  type: ModernButtonType.text,
                                 ),
-                                const SizedBox(height: 25),
+                              ),
+                              const SizedBox(height: SparshTheme.spacing24),
 
-                                // Login Button
-                                Container(
-                                  width: double.infinity,
-                                  height: 55,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.blue.shade700.withAlpha(
-                                          76,
-                                        ),
-                                        blurRadius: 10,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: _isLoading ? null : loginUser,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blue.shade600,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      elevation: 0,
-                                    ),
-                                    child:
-                                    _isLoading
-                                        ? const CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    )
-                                        : const Text(
-                                      'LOGIN',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.2,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              // Login Button
+                              ModernButton(
+                                text: 'LOGIN',
+                                onPressed: _isLoading ? null : loginUser,
+                                isLoading: _isLoading,
+                                isFullWidth: true,
+                                type: ModernButtonType.primary,
+                              ),
+                            ],
                           ),
                         ),
                       ),
 
                       // OTP Login Option
+                      const SizedBox(height: SparshTheme.spacing20),
                       Container(
                         width: double.infinity,
-                        margin: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 20),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LogInOtp(),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 15,
-                                  horizontal: 20,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withAlpha(51),
-                                  borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(
-                                    color: Colors.white.withAlpha(100),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.phone_android,
-                                      color: Colors.white,
-                                      size: 24,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      'Login with OTP',
-                                      style: Fonts.body.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                        margin: const EdgeInsets.symmetric(horizontal: SparshTheme.spacing20),
+                        child: ModernButton(
+                          text: 'Login with OTP',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LogInOtp(),
                               ),
-                            ),
-                          ],
+                            );
+                          },
+                          type: ModernButtonType.outline,
+                          icon: const Icon(Icons.phone_android),
+                          isFullWidth: true,
                         ),
                       ),
                     ],

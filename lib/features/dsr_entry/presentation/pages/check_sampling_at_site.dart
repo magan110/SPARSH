@@ -8,6 +8,10 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/document_number_storage.dart';
+import '../../../../core/widgets/modern_card.dart';
+import '../../../../core/widgets/modern_button.dart';
+import '../../../../core/widgets/modern_input.dart';
+import '../../../../core/widgets/modern_app_bar.dart';
 import 'dsr_entry.dart';
 import 'dsr_exception_entry.dart';
 

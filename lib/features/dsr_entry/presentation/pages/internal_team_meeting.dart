@@ -9,6 +9,10 @@ import 'package:geolocator/geolocator.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/document_number_storage.dart';
+import '../../../../core/widgets/modern_card.dart';
+import '../../../../core/widgets/modern_button.dart';
+import '../../../../core/widgets/modern_input.dart';
+import '../../../../core/widgets/modern_app_bar.dart';
 import 'dsr_entry.dart';
 import 'dsr_exception_entry.dart';
 
@@ -491,19 +495,9 @@ class _InternalTeamMeetingState extends State<InternalTeamMeeting> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: SparshTheme.scaffoldBackground,
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const DsrEntry()),
-          ),
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 22),
-        ),
-        title: Text(
-          'Internal Team Meeting',
-          style: SparshTypography.heading2.copyWith(color: Colors.white),
-        ),
-        backgroundColor: SparshTheme.primaryBlue,
+      appBar: const ModernAppBar(
+        title: 'Internal Team Meeting',
+        showBackButton: true,
       ),
       body: Form(
         key: _formKey,
@@ -513,134 +507,117 @@ class _InternalTeamMeetingState extends State<InternalTeamMeeting> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Process Type
-              Card(
-                margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_processTypeError != null)
-                        Text(_processTypeError!, style: const TextStyle(color: Colors.red)),
-                      _isLoadingProcessTypes
-                        ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
-                        : DropdownButtonFormField<String>(
-                            value: _processItem,
-                            decoration: InputDecoration(
-                              labelText: "Process Type",
-                              filled: true,
-                              fillColor: SparshTheme.lightGreyBackground,
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                            items: _processdropdownItems.map((it) => DropdownMenuItem(value: it, child: Text(it))).toList(),
-                            onChanged: (val) async {
-                              setState(() => _processItem = val);
-                              if (val == 'Update') await _fetchDocumentNumbers();
+              ModernCard(
+                title: 'Process Information',
+                icon: Icons.settings_outlined,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_processTypeError != null)
+                      Container(
+                        padding: const EdgeInsets.all(SparshTheme.spacing12),
+                        margin: const EdgeInsets.only(bottom: SparshTheme.spacing16),
+                        decoration: BoxDecoration(
+                          color: SparshTheme.errorRed.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+                          border: Border.all(color: SparshTheme.errorRed.withOpacity(0.3)),
+                        ),
+                        child: Text(_processTypeError!, style: const TextStyle(color: SparshTheme.errorRed)),
+                      ),
+                    _isLoadingProcessTypes
+                      ? const Center(child: CircularProgressIndicator(strokeWidth: 2))
+                      : ModernDropdown<String>(
+                          label: 'Process Type',
+                          value: _processItem == 'Select' ? null : _processItem,
+                          items: _processdropdownItems.where((item) => item != 'Select').map((item) => 
+                            DropdownMenuItem(value: item, child: Text(item))
+                          ).toList(),
+                          onChanged: (val) async {
+                            setState(() => _processItem = val ?? 'Select');
+                            if (val == 'Update') await _fetchDocumentNumbers();
+                          },
+                          validator: (val) => val == null ? 'Please select a process type' : null,
+                        ),
+                    if (_processItem == "Update") ...[
+                      const SizedBox(height: SparshTheme.spacing16),
+                      _loadingDocs
+                        ? const Center(child: CircularProgressIndicator())
+                        : ModernDropdown<String>(
+                            label: 'Document Number',
+                            value: _selectedDocuNumb,
+                            items: _documentNumbers.map((d) => 
+                              DropdownMenuItem(value: d, child: Text(d))
+                            ).toList(),
+                            onChanged: (v) async {
+                              setState(() => _selectedDocuNumb = v);
+                              if (v != null) await _fetchAndPopulateDetails(v);
                             },
-                            validator: (val) => (val == null || val == 'Select') ? 'Please select a process' : null,
+                            validator: (v) => v == null ? 'Please select a document number' : null,
                           ),
-                      if (_processItem == "Update") ...[
-                        const SizedBox(height: 8.0),
-                        _loadingDocs
-                          ? const Center(child: CircularProgressIndicator())
-                          : DropdownButtonFormField<String>(
-                              value: _selectedDocuNumb,
-                              decoration: const InputDecoration(labelText: 'Document Number'),
-                              items: _documentNumbers
-                                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-                                  .toList(),
-                              onChanged: (v) async {
-                                setState(() => _selectedDocuNumb = v);
-                                if (v != null) await _fetchAndPopulateDetails(v);
-                              },
-                              validator: (v) => v == null ? 'Required' : null,
-                            ),  
-                      ],
                     ],
-                  ),
+                  ],
                 ),
               ),
 
               // Dates
-              Card(
-                margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _submissionDateController,
-                        readOnly: true,
-                        enabled: false,
-                        decoration: InputDecoration(
-                          labelText: 'Submission Date',
-                          filled: true,
-                          fillColor: SparshTheme.lightGreyBackground,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-                          suffixIcon: const Icon(Icons.lock, color: Colors.grey),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                        validator: (val) => (val == null || val.isEmpty) ? 'Please select submission date' : null,
+              ModernCard(
+                title: 'Date Information',
+                icon: Icons.calendar_today_outlined,
+                child: Column(
+                  children: [
+                    ModernInput(
+                      label: 'Submission Date',
+                      controller: _submissionDateController,
+                      readOnly: true,
+                      enabled: false,
+                      suffixIcon: const Icon(Icons.lock, color: SparshTheme.textSecondary),
+                      validator: (val) => (val == null || val.isEmpty) ? 'Please select submission date' : null,
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Report Date',
+                      controller: _reportDateController,
+                      readOnly: true,
+                      onTap: _pickReportDate,
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today, color: SparshTheme.primaryBlue),
+                        onPressed: _pickReportDate,
                       ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _reportDateController,
-                        readOnly: true,
-                        onTap: _pickReportDate,
-                        decoration: InputDecoration(
-                          labelText: 'Report Date',
-                          filled: true,
-                          fillColor: SparshTheme.lightGreyBackground,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-                          suffixIcon: const Icon(Icons.calendar_today),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                        validator: (val) => (val == null || val.isEmpty) ? 'Please select report date' : null,
-                      ),
-                    ],
-                  ),
+                      validator: (val) => (val == null || val.isEmpty) ? 'Please select report date' : null,
+                    ),
+                  ],
                 ),
               ),
 
-              // Text fields
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: TextFormField(
-                  controller: _meetwithController,
-                  decoration: InputDecoration(
-                    labelText: 'Meeting With Whom (required)',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  validator: (v) => v == null || v.isEmpty ? 'Enter Meetwith' : null,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: TextFormField(
-                  controller: _meetdiscController,
-                  decoration: InputDecoration(
-                    labelText: 'Meeting Discussion Points (required)',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  maxLines: 3,
-                  validator: (v) => v == null || v.isEmpty ? 'Enter Meetdisc' : null,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: TextFormField(
-                  controller: _learnnngController,
-                  decoration: InputDecoration(
-                    labelText: 'Learnings (required)',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  maxLines: 3,
-                  validator: (v) => v == null || v.isEmpty ? 'Enter Learnnng' : null,
+              // Meeting Details
+              ModernCard(
+                title: 'Meeting Details',
+                icon: Icons.people_outline,
+                child: Column(
+                  children: [
+                    ModernInput(
+                      label: 'Meeting With Whom',
+                      controller: _meetwithController,
+                      prefixIcon: const Icon(Icons.person_outline, color: SparshTheme.primaryBlue),
+                      validator: (v) => v == null || v.isEmpty ? 'Please enter who you met with' : null,
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Meeting Discussion Points',
+                      controller: _meetdiscController,
+                      maxLines: 3,
+                      prefixIcon: const Icon(Icons.chat_bubble_outline, color: SparshTheme.primaryBlue),
+                      validator: (v) => v == null || v.isEmpty ? 'Please enter discussion points' : null,
+                    ),
+                    const SizedBox(height: SparshTheme.spacing16),
+                    ModernInput(
+                      label: 'Learnings',
+                      controller: _learnnngController,
+                      maxLines: 3,
+                      prefixIcon: const Icon(Icons.lightbulb_outline, color: SparshTheme.primaryBlue),
+                      validator: (v) => v == null || v.isEmpty ? 'Please enter learnings' : null,
+                    ),
+                  ],
                 ),
               ),
 
@@ -803,23 +780,20 @@ class _InternalTeamMeetingState extends State<InternalTeamMeeting> {
                 ),
               ),
 
-              ElevatedButton(
+              ModernButton(
+                text: _processItem == 'Update' ? 'Update & New' : 'Submit & New',
                 onPressed: () => _onSubmit(exitAfter: false),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: Text(_processItem == 'Update' ? 'Update & New' : 'Submit & New', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                type: ModernButtonType.secondary,
+                isFullWidth: true,
+                icon: const Icon(Icons.add_circle_outline),
               ),
-              const SizedBox(height: 12),
-              ElevatedButton(
+              const SizedBox(height: SparshTheme.spacing16),
+              ModernButton(
+                text: _processItem == 'Update' ? 'Update & Exit' : 'Submit & Exit',
                 onPressed: () => _onSubmit(exitAfter: true),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: SparshTheme.successGreen,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: Text(_processItem == 'Update' ? 'Update & Exit' : 'Submit & Exit', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                type: ModernButtonType.success,
+                isFullWidth: true,
+                icon: const Icon(Icons.check_circle_outline),
               ),
             ],
           ),

@@ -479,22 +479,27 @@ class SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: SparshTheme.spacing18, vertical: SparshTheme.spacing4),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          color: SparshTheme.surfacePrimary,
+          borderRadius: BorderRadius.circular(SparshTheme.radiusLg),
           boxShadow: [
             BoxShadow(
-              color: Colors.blueGrey.withOpacity(0.10),
-              blurRadius: 18,
-              offset: const Offset(0, 7),
+              color: SparshTheme.textPrimary.withOpacity(0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+              spreadRadius: 0,
             ),
           ],
+          border: Border.all(
+            color: SparshTheme.borderColor.withOpacity(0.1),
+            width: 1,
+          ),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+          padding: const EdgeInsets.all(SparshTheme.spacing20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -502,25 +507,29 @@ class SectionCard extends StatelessWidget {
                 children: [
                   if (icon != null)
                     Container(
-                      margin: const EdgeInsets.only(right: 10),
+                      margin: const EdgeInsets.only(right: SparshTheme.spacing12),
                       decoration: BoxDecoration(
-                        color: iconColor?.withOpacity(0.15) ?? Colors.blue.withOpacity(0.12),
+                        color: (iconColor ?? SparshTheme.primaryBlue).withOpacity(0.12),
                         shape: BoxShape.circle,
                       ),
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(icon, size: 22, color: iconColor ?? Colors.blue),
+                      padding: const EdgeInsets.all(SparshTheme.spacing10),
+                      child: Icon(
+                        icon, 
+                        size: 22, 
+                        color: iconColor ?? SparshTheme.primaryBlue,
+                      ),
                     ),
                   Text(
                     title,
-                    style: GoogleFonts.poppins(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w600,
-                      fontSize: 19,
-                      color: Colors.blueGrey.shade900,
+                      color: SparshTheme.textPrimary,
+                      letterSpacing: 0.15,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: SparshTheme.spacing16),
               child
             ],
           ),
