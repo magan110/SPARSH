@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:learning2/core/theme/app_theme.dart';
+import 'package:learning2/core/widgets/modern_card.dart';
+import 'package:learning2/core/widgets/modern_button.dart';
+import 'package:learning2/core/widgets/modern_input.dart';
 import 'package:learning2/features/dashboard/presentation/pages/splash_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,26 +28,112 @@ class ProfilePage extends StatelessWidget {
                     children: [
                       _buildSectionTitle('Account Info'),
                       const SizedBox(height: 14),
-                      _buildInfoCard([
-                        _buildTextField('Username*', Icons.person_outline),
-                        _buildTextField('Email Address*', Icons.email_outlined),
-                        _buildTextField('Phone Number*', Icons.phone_outlined),
-                      ]),
+                      ModernCard(
+                        child: Column(
+                          children: [
+                            ModernInput(
+                              label: 'Username',
+                              prefixIcon: const Icon(Icons.person_outline, color: SparshTheme.primaryBlue),
+                            ),
+                            const SizedBox(height: SparshTheme.spacing16),
+                            ModernInput(
+                              label: 'Email Address',
+                              keyboardType: TextInputType.emailAddress,
+                              prefixIcon: const Icon(Icons.email_outlined, color: SparshTheme.primaryBlue),
+                            ),
+                            const SizedBox(height: SparshTheme.spacing16),
+                            ModernInput(
+                              label: 'Phone Number',
+                              keyboardType: TextInputType.phone,
+                              prefixIcon: const Icon(Icons.phone_outlined, color: SparshTheme.primaryBlue),
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 22),
                       _buildSectionTitle('Dashboard Report'),
                       const SizedBox(height: 14),
-                      _buildInfoCard([
-                        _buildDropdownField('Select Report*', Icons.assessment_outlined),
-                      ]),
+                      ModernCard(
+                        child: ModernDropdown<String>(
+                          label: 'Select Report',
+                          items: const [
+                            DropdownMenuItem(value: 'Sales Summary', child: Text('Sales Summary')),
+                            DropdownMenuItem(value: 'DSR VIST', child: Text('DSR VIST')),
+                            DropdownMenuItem(value: 'Token Scan', child: Text('Token Scan')),
+                          ],
+                          onChanged: (value) {},
+                        ),
+                      ),
                       const SizedBox(height: 22),
                       _buildSectionTitle('Personal Info'),
                       const SizedBox(height: 14),
-                      _buildInfoCard([
-                        _buildDropdownField('Gender*', Icons.person_outline),
-                        _buildTextField('Address*', Icons.location_on_outlined),
-                      ]),
+                      ModernCard(
+                        child: Column(
+                          children: [
+                            ModernDropdown<String>(
+                              label: 'Gender',
+                              items: const [
+                                DropdownMenuItem(value: 'Male', child: Text('Male')),
+                                DropdownMenuItem(value: 'Female', child: Text('Female')),
+                                DropdownMenuItem(value: 'Other', child: Text('Other')),
+                              ],
+                              onChanged: (value) {},
+                            ),
+                            const SizedBox(height: SparshTheme.spacing16),
+                            ModernInput(
+                              label: 'Address',
+                              maxLines: 3,
+                              prefixIcon: const Icon(Icons.location_on_outlined, color: SparshTheme.primaryBlue),
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 32),
-                      _buildLogoutButton(context),
+                      ModernButton(
+                        text: 'Logout',
+                        icon: const Icon(Icons.logout),
+                        onPressed: () async {
+                          final bool? confirmLogout = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(SparshTheme.radiusLg),
+                              ),
+                              title: const Text(
+                                'Logout',
+                                style: TextStyle(
+                                  color: SparshTheme.primaryBlue,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              content: const Text('Are you sure you want to logout?'),
+                              actions: [
+                                ModernButton(
+                                  text: 'Cancel',
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  type: ModernButtonType.text,
+                                ),
+                                ModernButton(
+                                  text: 'Logout',
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  type: ModernButtonType.error,
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirmLogout == true) {
+                            final prefs = await SharedPreferences.getInstance();
+                            await prefs.clear();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SplashScreen()),
+                            );
+                          }
+                        },
+                        type: ModernButtonType.error,
+                        isFullWidth: true,
+                      ),
                       const SizedBox(height: 24),
                     ],
                   ),

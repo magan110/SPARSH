@@ -23,6 +23,9 @@ import 'universal_outlet_registration_page.dart';
 import 'mail_screen.dart';
 import 'package:learning2/core/constants/fonts.dart';
 import 'package:learning2/core/theme/app_theme.dart';
+import 'package:learning2/core/widgets/glassmorphic_card.dart';
+import 'package:learning2/core/widgets/glassmorphic_app_bar.dart';
+import 'package:learning2/core/widgets/brutalist_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -103,62 +106,50 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Builds the gradient AppBar with a search-icon and notifications-icon.
+  /// Builds the modern gradient AppBar with enhanced styling.
   PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      elevation: 4,
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: SparshTheme.appBarGradient,
-        ),
-      ),
-      title: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.star, color: Colors.white, size: 28),
-          SizedBox(width: 8),
-          Text(
-            'SPARSH',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ],
-      ),
-      centerTitle: true,
-      iconTheme: const IconThemeData(color: Colors.white),
+    return GlassmorphicAppBar(
+      title: 'SPARSH',
       actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.notifications_none,
-            size: 28,
-            color: Colors.white,
+          child: BrutalistButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationScreen(),
+                ),
+              );
+            },
+            backgroundColor: SparshTheme.brutalistBlack,
+            foregroundColor: SparshTheme.brutalistWhite,
+            padding: const EdgeInsets.all(SparshTheme.spacing8),
+            child: const Icon(Icons.notifications_outlined, size: 20),
           ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationScreen(),
-              ),
-            );
-          },
-        ),
-        AnimatedSwitcher(
+        const SizedBox(width: SparshTheme.spacing16),
+      ],
+    );
+  }
+
+  /// Builds the search button with brutalist styling.
+  Widget _buildSearchButton() {
+    return AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           transitionBuilder: (Widget child, Animation<double> animation) {
             return ScaleTransition(scale: animation, child: child);
           },
-          child:
-              _isSearchVisible
-                  ? const SizedBox(width: 48, height: 48)
-                  : IconButton(
+          child: _isSearchVisible
+              ? const SizedBox(width: 48, height: 48)
+              : Container(
+                  margin: const EdgeInsets.only(right: SparshTheme.spacing16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+                  ),
+                  child: IconButton(
                     key: const ValueKey('search_icon'),
                     icon: const Icon(
-                      Icons.search,
-                      size: 28,
+                      Icons.search_outlined,
+                      size: 24,
                       color: Colors.white,
                     ),
                     onPressed: () {
@@ -167,12 +158,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       });
                     },
                   ),
+                ),
         ),
       ],
     );
   }
 
-  /// The sliding search bar that appears on top of everything else.
+  /// Modern search overlay with enhanced styling.
   Widget _buildSearchInput(BuildContext context) {
     return AnimatedOpacity(
       opacity: _isSearchVisible ? 1.0 : 0.0,
@@ -180,58 +172,143 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Visibility(
         visible: _isSearchVisible,
         child: Container(
-          color: Colors.white,
+          decoration: BoxDecoration(
+            color: SparshTheme.surfacePrimary,
+            boxShadow: [
+              BoxShadow(
+                color: SparshTheme.textPrimary.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(SparshTheme.spacing16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search for reports, screens, etc...',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
-                      setState(() {
-                        _isSearchVisible = false;
-                        _searchController.clear();
-                        _filteredSearchItems = [];
-                      });
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Container(
+                decoration: BoxDecoration(
+                  color: SparshTheme.surfaceSecondary,
+                  borderRadius: BorderRadius.circular(SparshTheme.radiusMd),
+                  border: Border.all(
+                    color: SparshTheme.borderColor.withOpacity(0.2),
+                    width: 1,
                   ),
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    _filteredSearchItems = value.isEmpty
-                        ? []
-                        : _searchItems.where((item) =>
-                            item.title.toLowerCase().contains(value.toLowerCase()) ||
-                            item.type.toLowerCase().contains(value.toLowerCase())
-                          ).toList();
-                  });
-                },
-                onSubmitted: (value) {
-                  setState(() {
-                    _isSearchVisible = false;
-                    _searchController.clear();
-                    _filteredSearchItems = [];
-                  });
-                },
+                child: TextField(
+                  controller: _searchController,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: SparshTheme.textPrimary,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Search for reports, screens, etc...',
+                    hintStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: SparshTheme.textSecondary,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search_outlined,
+                      color: SparshTheme.textSecondary,
+                      size: 20,
+                    ),
+                    suffixIcon: Container(
+                      margin: const EdgeInsets.all(SparshTheme.spacing8),
+                      decoration: BoxDecoration(
+                        color: SparshTheme.textSecondary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.close_rounded,
+                          color: SparshTheme.textSecondary,
+                          size: 18,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isSearchVisible = false;
+                            _searchController.clear();
+                            _filteredSearchItems = [];
+                          });
+                        },
+                      ),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: SparshTheme.spacing16,
+                      vertical: SparshTheme.spacing14,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _filteredSearchItems = value.isEmpty
+                          ? []
+                          : _searchItems.where((item) =>
+                              item.title.toLowerCase().contains(value.toLowerCase()) ||
+                              item.type.toLowerCase().contains(value.toLowerCase())
+                            ).toList();
+                    });
+                  },
+                  onSubmitted: (value) {
+                    setState(() {
+                      _isSearchVisible = false;
+                      _searchController.clear();
+                      _filteredSearchItems = [];
+                    });
+                  },
+                ),
               ),
-              if (_filteredSearchItems.isNotEmpty)
+              if (_filteredSearchItems.isNotEmpty) ...[
+                const SizedBox(height: SparshTheme.spacing12),
                 Container(
                   constraints: const BoxConstraints(maxHeight: 300),
+                  decoration: BoxDecoration(
+                    color: SparshTheme.surfacePrimary,
+                    borderRadius: BorderRadius.circular(SparshTheme.radiusMd),
+                    border: Border.all(
+                      color: SparshTheme.borderColor.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount: _filteredSearchItems.length,
                     itemBuilder: (context, index) {
                       final item = _filteredSearchItems[index];
                       return ListTile(
-                        title: Text(item.title),
-                        subtitle: Text(item.type),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: SparshTheme.spacing16,
+                          vertical: SparshTheme.spacing8,
+                        ),
+                        leading: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: SparshTheme.primaryBlue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+                          ),
+                          child: Icon(
+                            Icons.apps_rounded,
+                            color: SparshTheme.primaryBlue,
+                            size: 20,
+                          ),
+                        ),
+                        title: Text(
+                          item.title,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: SparshTheme.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        subtitle: Text(
+                          item.type,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: SparshTheme.textSecondary,
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: SparshTheme.textSecondary,
+                          size: 16,
+                        ),
                         onTap: () {
                           setState(() {
                             _isSearchVisible = false;
@@ -246,6 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
+              ],
             ],
           ),
         ),
@@ -658,10 +736,38 @@ class _HomeContentState extends State<HomeContent> {
 
   Widget _sectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4.0),
-      child: Text(
-        title,
-        style: Fonts.bodyBold,
+      padding: const EdgeInsets.only(left: SparshTheme.spacing4),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 32,
+            decoration: BoxDecoration(
+              color: SparshTheme.brutalistYellow,
+              border: Border.all(
+                color: SparshTheme.brutalistBlack,
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: SparshTheme.brutalistBlack,
+                  offset: const Offset(2, 2),
+                  blurRadius: 0,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: SparshTheme.spacing16),
+          Text(
+            title.toUpperCase(),
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.0,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -711,19 +817,14 @@ class _HomeContentState extends State<HomeContent> {
     // Three columns to match your screenshot. Adjust to 4 if you'd prefer a 4-column layout.
     final double itemWidth = screenWidth / 3;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-        border: Border.all(color: Colors.grey.shade300, width: 1),
-        color: Colors.white,
-      ),
+    return ModernCard(
+      padding: const EdgeInsets.all(SparshTheme.spacing20),
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, // ← 3 columns for Quick Menu
-          crossAxisSpacing: 12.0,
-          mainAxisSpacing: 16.0,
-          childAspectRatio: 0.85, // Adjusted to accommodate button-style items
+          crossAxisCount: 3,
+          crossAxisSpacing: SparshTheme.spacing16,
+          mainAxisSpacing: SparshTheme.spacing20,
+          childAspectRatio: 0.85,
         ),
         itemCount: quickMenuItems.length,
         shrinkWrap: true,
@@ -799,30 +900,51 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  /// Helper to draw each Quick Menu icon + label.
+  /// Modern Quick Menu item with enhanced styling.
   Widget _buildQuickMenuItem(String imagePath, String label, double itemWidth) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Material(
-          elevation: 4.0,
-          borderRadius: BorderRadius.circular(12.0),
-          child: Container(
-            width: 56,
-            height: 56,
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              color: Colors.white,
+        Container(
+          width: 72,
+          height: 72,
+          decoration: BoxDecoration(
+            color: SparshTheme.brutalistWhite,
+            border: Border.all(
+              color: SparshTheme.brutalistBlack,
+              width: 3,
             ),
-            child: Image.asset(imagePath, fit: BoxFit.contain),
+            boxShadow: [
+              BoxShadow(
+                color: SparshTheme.brutalistBlack,
+                offset: const Offset(4, 4),
+                blurRadius: 0,
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(SparshTheme.spacing12),
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.apps_rounded,
+                color: SparshTheme.brutalistBlack,
+                size: 32,
+              );
+            },
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: SparshTheme.spacing12),
         Text(
-          label,
+          label.toUpperCase(),
           textAlign: TextAlign.center,
-          style: Fonts.small,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w900,
+            fontSize: 12,
+            letterSpacing: 0.5,
+          ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
@@ -830,7 +952,7 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 
-  /// "Mostly Used Apps" row (unchanged from before):
+  /// Glassmorphic "Mostly Used Apps" with brutalist items
   Widget _mostlyUsedApps(double screenWidth, double screenHeight) {
     final List<Map<String, String>> mostlyUsedItems = [
       {'image': 'assets/image33.png', 'label': 'DSR', 'route': 'dsr'},
@@ -851,123 +973,188 @@ class _HomeContentState extends State<HomeContent> {
       },
     ];
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-        border: Border.all(color: Colors.grey.shade300, width: 1),
-        color: Colors.white,
-      ),
+    return GlassmorphicCard(
+      backgroundColor: SparshTheme.glassWhite,
+      borderColor: SparshTheme.glassBorder,
+      blurIntensity: 12.0,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children:
-            mostlyUsedItems.map((item) {
-              return Expanded(
-                child: InkWell(
-                  onTap: () {
-                    if (item['route'] == 'dsr') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DsrEntry(),
-                        ),
-                      );
-                    } else if (item['route'] == 'scanner') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const TokenScanPage(),
-                        ),
-                      );
-                    }
-                  },
-                  child: _buildMostlyUsedAppItem(
-                    item['image']!,
-                    item['label']!,
-                  ),
-                ),
-              );
-            }).toList(),
+        children: mostlyUsedItems.map((item) {
+          return Expanded(
+            child: InkWell(
+              onTap: () {
+                if (item['route'] == 'dsr') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DsrEntry(),
+                    ),
+                  );
+                } else if (item['route'] == 'scanner') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TokenScanPage(),
+                    ),
+                  );
+                }
+              },
+              borderRadius: BorderRadius.circular(SparshTheme.radiusMd),
+              child: _buildMostlyUsedAppItem(
+                item['image']!,
+                item['label']!,
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 
   Widget _buildMostlyUsedAppItem(String imagePath, String text) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Material(
-          elevation: 4.0,
-          borderRadius: BorderRadius.circular(12.0),
-          child: Container(
-            width: 56,
-            height: 56,
-            padding: const EdgeInsets.all(8),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: SparshTheme.spacing8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0),
-              color: Colors.white,
+              color: SparshTheme.brutalistBlack,
+              border: Border.all(
+                color: SparshTheme.brutalistWhite,
+                width: 3,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: SparshTheme.brutalistYellow,
+                  offset: const Offset(4, 4),
+                  blurRadius: 0,
+                ),
+              ],
             ),
-            child: Image.asset(imagePath, fit: BoxFit.contain),
+            padding: const EdgeInsets.all(SparshTheme.spacing16),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.contain,
+              color: Colors.white,
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(
+                  Icons.apps_rounded,
+                  color: Colors.white,
+                  size: 36,
+                );
+              },
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          text,
-          textAlign: TextAlign.center,
-          style: Fonts.small,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
+          const SizedBox(height: SparshTheme.spacing12),
+          Text(
+            text.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w900,
+              fontSize: 12,
+              letterSpacing: 0.5,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
-  /// Banner widget (unchanged):
+  /// Glassmorphic banner with brutalist indicators.
   Widget _buildBanner() {
-    return SizedBox(
-      height: 160,
+    return Container(
+      height: 180,
+      margin: const EdgeInsets.symmetric(horizontal: SparshTheme.spacing4),
       child: Stack(
         children: [
-          PageView.builder(
-            controller: _pageController,
-            itemCount: _bannerImagePaths.length,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    _bannerImagePaths[index],
-                    fit: BoxFit.cover,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20.0),
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: _bannerImagePaths.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: SparshTheme.spacing4),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          _bannerImagePaths[index],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    SparshTheme.brutalistBlue,
+                                    SparshTheme.brutalistBlack,
+                                  ],
+                                ),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.image_outlined,
+                                  color: Colors.white,
+                                  size: 48,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: SparshTheme.glassWhite,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
           if (_bannerImagePaths.length > 1)
             Positioned(
-              bottom: 10,
+              bottom: SparshTheme.spacing16,
               left: 0,
               right: 0,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(_bannerImagePaths.length, (index) {
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: _currentIndex == index ? 16 : 8,
-                    height: 8,
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                  return Container(
+                    width: _currentIndex == index ? 32 : 16,
+                    height: 16,
+                    margin: const EdgeInsets.symmetric(horizontal: SparshTheme.spacing4),
                     decoration: BoxDecoration(
-                      color:
-                          _currentIndex == index
-                              ? Colors.blue
-                              : Colors.white.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(4),
+                      color: _currentIndex == index
+                          ? SparshTheme.brutalistYellow
+                          : SparshTheme.brutalistWhite,
+                      border: Border.all(
+                        color: SparshTheme.brutalistBlack,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: SparshTheme.brutalistBlack,
+                          offset: const Offset(2, 2),
+                          blurRadius: 0,
+                        ),
+                      ],
                     ),
                   );
                 }),
@@ -1012,29 +1199,25 @@ class _HorizontalMenuState extends State<HorizontalMenu> {
 
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                backgroundColor: isSelected ? Colors.blue : Colors.white,
-                foregroundColor: isSelected ? Colors.white : Colors.blue,
-                side: BorderSide(
-                  color: isSelected ? Colors.blue : Colors.grey.shade400,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-              ),
+            child: BrutalistButton(
               onPressed: () {
                 setState(() {
                   selected = label;
                 });
               },
+              backgroundColor: isSelected ? SparshTheme.brutalistBlack : SparshTheme.brutalistWhite,
+              foregroundColor: isSelected ? SparshTheme.brutalistWhite : SparshTheme.brutalistBlack,
+              isSelected: isSelected,
+              borderColor: SparshTheme.brutalistBlack,
+              borderWidth: 3,
               child: Text(
-                label,
-                style: Fonts.body,
+                label.toUpperCase(),
+                style: TextStyle(
+                  color: isSelected ? SparshTheme.brutalistWhite : SparshTheme.brutalistBlack,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
           );

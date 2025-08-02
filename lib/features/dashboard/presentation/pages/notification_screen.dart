@@ -3,6 +3,8 @@ import 'package:learning2/features/dashboard/presentation/pages/home_screen.dart
 import 'package:provider/provider.dart';
 import 'package:learning2/core/constants/fonts.dart';
 import 'package:learning2/core/theme/app_theme.dart';
+import 'package:learning2/core/widgets/modern_card.dart';
+import 'package:learning2/core/widgets/modern_app_bar.dart';
 
 void main() {
   runApp(
@@ -107,18 +109,9 @@ class NotificationScreen extends StatelessWidget {
     final notifications = notificationProvider.notifications;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: SparshTheme.primaryBlue,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-            );
-          },
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        title: const Text('SPARSH', style: TextStyle(color: Colors.white)),
+      appBar: const ModernAppBar(
+        title: 'Notifications',
+        showBackButton: true,
       ),
       body: notifications.isEmpty
           ? const Center(
@@ -184,62 +177,69 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: item.iconBgColor,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(item.icon, color: item.iconColor, size: 24),
+    return ModernCard(
+      margin: const EdgeInsets.only(bottom: SparshTheme.spacing16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: item.iconBgColor,
+              shape: BoxShape.circle,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.message,
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+            child: Icon(item.icon, color: item.iconColor, size: 24),
+          ),
+          const SizedBox(width: SparshTheme.spacing16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.message,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: SparshTheme.textPrimary,
+                    height: 1.4,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: item.statusColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          item.status,
-                          style: Fonts.bodyBold.copyWith(color: item.statusColor),
+                ),
+                const SizedBox(height: SparshTheme.spacing12),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: SparshTheme.spacing12,
+                        vertical: SparshTheme.spacing6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: item.statusColor.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(SparshTheme.radiusSm),
+                        border: Border.all(
+                          color: item.statusColor.withOpacity(0.3),
+                          width: 1,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _formatDate(item.date),
-                        style: Fonts.small.copyWith(color: Colors.grey[600]),
+                      child: Text(
+                        item.status,
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: item.statusColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    const SizedBox(width: SparshTheme.spacing12),
+                    Text(
+                      _formatDate(item.date),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: SparshTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
