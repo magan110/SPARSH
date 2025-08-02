@@ -1,145 +1,172 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// SPARSH App Theme - Professional Design System
-/// Modern, beautiful, and eye-pleasing theme with sophisticated color palette
+/// SPARSH App Theme - Modern Material Design 3 System
+/// Beautiful, accessible, and consistent design with sophisticated color palette
 class SparshTheme {
-  // ===== MODERN COLOR PALETTE =====
+  // ===== MODERN MATERIAL DESIGN 3 COLOR PALETTE =====
   
-  // Primary Colors - Professional Blue Palette
-  static const Color primaryBlue = Color(0xFF2196F3); // Unified blue
-  static const Color primaryBlueLight = Color(0xFF2196F3);
-  static const Color primaryBlueAccent = Color(0xFF2196F3);
-  static const Color primaryBlueShade700 = Color(0xFF2196F3);
-  static const Color primaryBlueShade400 = Color(0xFF2196F3);
-  static const Color primaryBlueShade100 = Color(0xFF2196F3);
+  // Primary Colors - Modern Blue Palette
+  static const Color primaryBlue = Color(0xFF1976D2); // Rich blue
+  static const Color primaryBlueLight = Color(0xFF42A5F5); // Light blue
+  static const Color primaryBlueAccent = Color(0xFF2196F3); // Accent blue
+  static const Color primaryBlueDark = Color(0xFF0D47A1); // Dark blue
+  static const Color primaryBlueShade50 = Color(0xFFE3F2FD);
+  static const Color primaryBlueShade100 = Color(0xFFBBDEFB);
+  static const Color primaryBlueShade200 = Color(0xFF90CAF9);
   
-  // Secondary Colors - Elegant Purple Palette
-  // static const Color deepPurple = Color(0xFF7C3AED); // Modern purple
-  // static const Color deepPurpleShade700 = Color(0xFF5B21B6);
-  // static const Color deepPurpleShade400 = Color(0xFFA78BFA);
-  // static const Color deepPurpleShade100 = Color(0xFFEDE9FE);
+  // Secondary Colors - Modern Teal Palette
+  static const Color secondaryTeal = Color(0xFF00BCD4);
+  static const Color secondaryTealLight = Color(0xFF4DD0E1);
+  static const Color secondaryTealDark = Color(0xFF0097A7);
   
-  // Accent Colors - Vibrant but Professional
-  // static const Color purple = Color(0xFF8B5CF6);
-  // static const Color purpleShade300 = Color(0xFFC4B5FD);
-  // static const Color purpleShade100 = Color(0xFFF3F4F6);
-  
-  // Background Colors - Clean and Modern
-  static const Color scaffoldBackground = Color(0xFFF8FAFC); // Very light blue-grey
+  // Surface Colors - Clean and Modern
+  static const Color surfacePrimary = Color(0xFFFFFFFF);
+  static const Color surfaceSecondary = Color(0xFFF8FAFC);
+  static const Color surfaceTertiary = Color(0xFFF1F5F9);
+  static const Color scaffoldBackground = Color(0xFFF8FAFC);
   static const Color cardBackground = Color(0xFFFFFFFF);
-  static const Color lightBlueBackground = Color(0xFFEFF6FF);
-  static const Color lightGreenBackground = Color(0xFFF0FDF4);
-  static const Color lightPurpleBackground = Color(0xFFFAF5FF);
-  static const Color lighterPurpleBackground = Color(0xFFF3E8FF);
-  static const Color lightGreyBackground = Color(0xFFF9FAFB);
   
-  // Text Colors - High Contrast for Readability
-  static const Color textPrimary = Color(0xFF1F2937); // Dark grey
-  static const Color textSecondary = Color(0xFF6B7280); // Medium grey
-  static const Color textTertiary = Color(0xFF9CA3AF); // Light grey
-  static const Color textBlack = Color(0xFF111827);
-  static const Color textBlack87 = Color(0xFF000000);
-  static const Color textGrey = Color(0xFF6B7280);
-  static const Color textLightGrey = Color(0xFF9CA3AF);
+  // Background Variants
+  static const Color lightBlueBackground = Color(0xFFE3F2FD);
+  static const Color lightGreenBackground = Color(0xFFE8F5E8);
+  static const Color lightOrangeBackground = Color(0xFFFFF3E0);
+  static const Color lightRedBackground = Color(0xFFFFEBEE);
+  static const Color lightGreyBackground = Color(0xFFF5F5F5);
   
-  // Border Colors - Subtle and Professional
-  static const Color borderGrey = Color(0xFFE5E7EB);
-  static const Color borderLightGrey = Color(0xFFF3F4F6);
-  static const Color borderDarkGrey = Color(0xFFD1D5DB);
+  // Text Colors - High Contrast for Accessibility
+  static const Color textPrimary = Color(0xFF1A1A1A);
+  static const Color textSecondary = Color(0xFF666666);
+  static const Color textTertiary = Color(0xFF999999);
+  static const Color textDisabled = Color(0xFFBDBDBD);
+  static const Color textOnPrimary = Color(0xFFFFFFFF);
   
-  // Status Colors - Modern and Accessible
-  static const Color successGreen = Color(0xFF10B981); // Modern green
-  static const Color successLight = Color(0xFFD1FAE5);
-  static const Color warningOrange = Color(0xFFF59E0B); // Modern orange
-  static const Color warningLight = Color(0xFFFEF3C7);
-  static const Color errorRed = Color(0xFFEF4444); // Modern red
-  static const Color errorLight = Color(0xFFFEE2E2);
-  static const Color infoBlue = Color(0xFF3B82F6); // Modern blue
-  static const Color infoLight = Color(0xFFDBEAFE);
+  // Border Colors - Subtle and Modern
+  static const Color borderLight = Color(0xFFE0E0E0);
+  static const Color borderMedium = Color(0xFFBDBDBD);
+  static const Color borderDark = Color(0xFF757575);
+  
+  // Status Colors - Material Design 3 Semantic Colors
+  static const Color successGreen = Color(0xFF4CAF50);
+  static const Color successLight = Color(0xFFE8F5E8);
+  static const Color successDark = Color(0xFF2E7D32);
+  
+  static const Color warningOrange = Color(0xFFFF9800);
+  static const Color warningLight = Color(0xFFFFF3E0);
+  static const Color warningDark = Color(0xFFE65100);
+  
+  static const Color errorRed = Color(0xFFF44336);
+  static const Color errorLight = Color(0xFFFFEBEE);
+  static const Color errorDark = Color(0xFFD32F2F);
+  
+  static const Color infoBlue = Color(0xFF2196F3);
+  static const Color infoLight = Color(0xFFE3F2FD);
+  static const Color infoDark = Color(0xFF1976D2);
   
   // Seat Colors - Enhanced for better visibility
-  static const Color seatAvailable = Color(0xFF10B981);
-  static const Color seatSelected = Color(0xFFF59E0B);
-  static const Color seatBooked = Color(0xFFEF4444);
+  static const Color seatAvailable = Color(0xFF4CAF50);
+  static const Color seatSelected = Color(0xFFFF9800);
+  static const Color seatBooked = Color(0xFFF44336);
   
-  // ===== BEAUTIFUL GRADIENTS =====
+  // ===== MODERN GRADIENTS =====
   
-  // Primary Gradients
+  // Primary Gradients - Material Design 3 Style
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primaryBlue, primaryBlueLight],
+    colors: [primaryBlueDark, primaryBlue, primaryBlueLight],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    stops: [0.0, 1.0],
+    stops: [0.0, 0.5, 1.0],
   );
   
   static const LinearGradient primaryGradientVertical = LinearGradient(
     colors: [primaryBlue, primaryBlueLight],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    stops: [0.0, 1.0],
   );
   
-  static const LinearGradient primaryGradientDiagonal = LinearGradient(
-    colors: [primaryBlue, primaryBlueAccent],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    stops: [0.0, 1.0],
+  static const LinearGradient primaryGradientSubtle = LinearGradient(
+    colors: [primaryBlueShade50, surfacePrimary],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
   );
   
-  // Accent Gradients
-  static const LinearGradient blueAccentGradient = LinearGradient(
-    colors: [primaryBlueAccent, Color(0xFF60A5FA)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    stops: [0.0, 1.0],
-  );
-  
-  static const LinearGradient orangeGradient = LinearGradient(
-    colors: [Color(0xFFF59E0B), Color(0xFFF97316)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    stops: [0.0, 1.0],
-  );
-  
-  static const LinearGradient greenGradient = LinearGradient(
-    colors: [Color(0xFF10B981), Color(0xFF059669)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    stops: [0.0, 1.0],
-  );
-  
-  static const LinearGradient redGradient = LinearGradient(
-    colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    stops: [0.0, 1.0],
-  );
-  
-  // Special Gradients
+  // App Bar Gradient - Modern and Vibrant
   static const LinearGradient appBarGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primaryBlue, primaryBlueAccent],
-    stops: [0.0, 1.0],
+    colors: [primaryBlueDark, primaryBlue, primaryBlueAccent],
+    stops: [0.0, 0.6, 1.0],
   );
   
-  static const LinearGradient drawerHeaderGradient = LinearGradient(
-    colors: [primaryBlue, primaryBlueLight],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    stops: [0.0, 1.0],
-  );
-  
+  // Card Gradients - Subtle and Elegant
   static const LinearGradient cardGradient = LinearGradient(
-    colors: [Colors.white, Color(0xFFF8FAFC)],
+    colors: [surfacePrimary, surfaceSecondary],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    stops: [0.0, 1.0],
   );
   
-  // ===== MAIN APP THEME =====
+  static const LinearGradient cardGradientElevated = LinearGradient(
+    colors: [surfacePrimary, Color(0xFFF0F4F8)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
   
+  // Status Gradients
+  static const LinearGradient successGradient = LinearGradient(
+    colors: [successGreen, Color(0xFF66BB6A)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  
+  static const LinearGradient warningGradient = LinearGradient(
+    colors: [warningOrange, Color(0xFFFFB74D)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  
+  static const LinearGradient errorGradient = LinearGradient(
+    colors: [errorRed, Color(0xFFEF5350)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  
+  // ===== SPACING SYSTEM =====
+  
+  static const double spacing4 = 4.0;
+  static const double spacing8 = 8.0;
+  static const double spacing12 = 12.0;
+  static const double spacing16 = 16.0;
+  static const double spacing20 = 20.0;
+  static const double spacing24 = 24.0;
+  static const double spacing32 = 32.0;
+  static const double spacing40 = 40.0;
+  static const double spacing48 = 48.0;
+  static const double spacing64 = 64.0;
+  
+  // ===== BORDER RADIUS SYSTEM =====
+  
+  static const double radiusXs = 4.0;
+  static const double radiusSm = 8.0;
+  static const double radiusMd = 12.0;
+  static const double radiusLg = 16.0;
+  static const double radiusXl = 20.0;
+  static const double radiusXxl = 24.0;
+  static const double radiusFull = 999.0;
+  
+  // ===== ELEVATION SYSTEM =====
+  
+  static const double elevation0 = 0.0;
+  static const double elevation1 = 1.0;
+  static const double elevation2 = 2.0;
+  static const double elevation4 = 4.0;
+  static const double elevation6 = 6.0;
+  static const double elevation8 = 8.0;
+  static const double elevation12 = 12.0;
+  static const double elevation16 = 16.0;
+  static const double elevation24 = 24.0;
+
+  // ===== MAIN APP THEME =====
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -777,4 +804,4 @@ class SparshCurves {
   static const Curve easeIn = Curves.easeIn;
   static const Curve fastOutSlowIn = Curves.fastOutSlowIn;
   static const Curve bounceOut = Curves.bounceOut;
-} 
+}  
